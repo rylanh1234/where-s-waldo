@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Where's Waldo</title>
+</head>
+<body>
+    <div id="photoDiv"></div>
+
+    <script>
+        async function loadPhoto(photoId) {
+            const res = await fetch(`/api/${photoId}`);
+            const photo = await res.json();
+
+            const photoDiv = document.getElementById("photoDiv");
+            const photoImg = document.createElement("img");
+            photoImg.src = photo.imageUrl;
+            photoImg.style.width = '85vw';
+            photoImg.style.height = '85vh';
+            photoDiv.appendChild(photoImg);
+        }
+
+        async function selectPhoto() {
+            const photoId = 1;
+            return photoId;
+        }
+
+        async function main() {
+            const photoId = await selectPhoto();
+            await loadPhoto(photoId);
+        }
+        
+        main();
+    </script>
+</body>
+</html>

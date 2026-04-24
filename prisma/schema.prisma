@@ -1,0 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Photo { 
+  id    Int     @id @default(autoincrement()) 
+  name  String
+  imageUrl  String
+  coordinates   Coordinate[]
+  records Record[]
+}
+
+model Record { 
+  id        Int     @id @default(autoincrement()) 
+  photo     Photo    @relation(fields: [photoId], references: [id]) 
+  photoId   Int
+  holder    String
+  time      Int
+} 
+
+model Coordinate {
+  id        Int     @id @default(autoincrement())
+  photo     Photo    @relation(fields: [photoId], references: [id]) 
+  photoId   Int
+  name      String
+  xpos      Int
+  ypos      Int
+}
