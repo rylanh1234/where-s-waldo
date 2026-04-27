@@ -15,10 +15,14 @@
 
             const photoDiv = document.getElementById("photoDiv");
             const photoImg = document.createElement("img");
+            photoDiv.style.width = '85vw';
+            photoDiv.style.height = '85vh';
             photoImg.src = photo.imageUrl;
-            photoImg.style.width = '85vw';
-            photoImg.style.height = '85vh';
+            photoImg.style.width = '100%';
+            photoImg.style.height = '100%';
             photoDiv.appendChild(photoImg);
+
+            photoDiv.addEventListener("click", clickDropdown);
         }
 
         async function selectPhoto() {
@@ -26,9 +30,47 @@
             return photoId;
         }
 
+        function clickDropdown(e) {
+            const dropdownDiv = document.createElement("div");
+            const photoDiv = document.getElementById("photoDiv");
+            // if dropdown already exists, remove it and make new one
+            if (photoDiv.childElementCount > 1) {
+                photoDiv.lastChild.remove()
+            }
+
+            // calculate the coordinates of user click (in px)
+            const rect = photoDiv.getBoundingClientRect();
+            const xcoordpx = e.clientX - rect.left;
+            const ycoordpx = e.clientY - rect.top;
+            // convert to vw and vh units
+            const xcoord = (xcoordpx / window.innerWidth) * 100;
+            const ycoord = (ycoordpx / window.innerHeight) * 100;
+
+            photoDiv.style.position = "relative";
+            photoDiv.appendChild(dropdownDiv);
+            dropdownDiv.style.position = "absolute";
+            dropdownDiv.style.left = xcoord.toString() + "vw";
+            dropdownDiv.style.top = ycoord.toString() + "vh";
+            dropdownDiv.style.backgroundColor = "rgb(240, 240, 240, 0.85)";
+            dropdownDiv.style.width = "5vw";
+            dropdownDiv.style.height = "10vh";
+        }
+
+        function addClearDropdown() {
+            const excluded = document.getElementById("photoDiv");
+            const photoDiv = document.getElementById("photoDiv");
+            // remove dropdown when user clicks away from photo
+            document.addEventListener("click", (e) => {
+                if (!excluded.contains(e.target) && photoDiv.childElementCount > 1) {
+                    photoDiv.lastChild.remove();
+                }
+            })
+        }
+
         async function main() {
             const photoId = await selectPhoto();
             await loadPhoto(photoId);
+            addClearDropdown();
         }
         
         main();
