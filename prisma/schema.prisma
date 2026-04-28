@@ -33,6 +33,6 @@ model Coordinate {
   photo     Photo    @relation(fields: [photoId], references: [id]) 
   photoId   Int
   name      String
-  xpos      Int
-  ypos      Int
+  xpos      Float[]
+  ypos      Float[]
 }
