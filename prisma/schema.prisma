@@ -35,4 +35,5 @@ model Coordinate {
   name      String
   xpos      Float[]
   ypos      Float[]
+  found     Boolean   @default(false)
 }

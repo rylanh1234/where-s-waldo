@@ -7,12 +7,14 @@
 </head>
 <body>
     <div id="photoDiv"></div>
+    <div id="wrongMessageDiv"></div>
 
     <script>
         async function loadPhoto(photoId) {
             const res = await fetch(`/api/${photoId}`);
             const photo = await res.json();
 
+            document.body.style.display = "flex";
             const photoDiv = document.getElementById("photoDiv");
             const photoImg = document.createElement("img");
             photoDiv.style.width = '85vw';
@@ -35,8 +37,8 @@
         function clickDropdown(e, photoDiv, coordinatesArray) {
             const dropdownDiv = document.createElement("div");
             // if dropdown already exists, remove it and make new one
-            if (photoDiv.childElementCount > 1) {
-                photoDiv.lastChild.remove()
+            if (photoDiv.querySelector("#dropdownDiv")) {
+                photoDiv.lastChild.remove();
             }
 
             // calculate the coordinates of user click (in px)
@@ -49,6 +51,7 @@
 
             photoDiv.style.position = "relative";
             photoDiv.appendChild(dropdownDiv);
+            dropdownDiv.setAttribute("id", "dropdownDiv");
             dropdownDiv.style.position = "absolute";
             dropdownDiv.style.left = xcoord.toString() + "vw";
             dropdownDiv.style.top = ycoord.toString() + "vh";
@@ -61,12 +64,21 @@
                 targetDiv.setAttribute("id", coordinate.name)
                 targetDiv.textContent = coordinate.name;
                 targetDiv.style.border = "black 1px solid";
-                targetDiv.addEventListener("click", () => {
-                   const isHit = targetHit([xcoord, ycoord], [coordinate.xpos, coordinate.ypos]);
-                   if (isHit) {
-                    addMarker(photoDiv, dropdownDiv, [xcoord, ycoord]);
-                   }
-                });
+                if (coordinate.found) {
+                    targetDiv.style.textDecoration = "line-through";
+                }
+                else {
+                    targetDiv.addEventListener("click", () => {
+                    const isHit = targetHit([xcoord, ycoord], [coordinate.xpos, coordinate.ypos]);
+                    if (isHit) {
+                        addMarker(photoDiv, dropdownDiv, [xcoord, ycoord]);
+                        coordinate.found = true;
+                    }
+                    else {
+                        wrongMessage(coordinate.name);
+                    }
+                    });
+                }
                 dropdownDiv.appendChild(targetDiv);
             })
             dropdownDiv.style.display = "grid";
@@ -78,7 +90,7 @@
             const photoDiv = document.getElementById("photoDiv");
             // remove dropdown when user clicks away from photo
             document.addEventListener("click", (e) => {
-                if (!excluded.contains(e.target) && photoDiv.childElementCount > 1) {
+                if (!excluded.contains(e.target) && photoDiv.querySelector("#dropdownDiv")) {
                     photoDiv.lastChild.remove();
                 }
             })
@@ -112,6 +124,17 @@
             markerDiv.style.left = (userCoordinates[0] - 1).toString() + "vw";
             markerDiv.style.top = (userCoordinates[1] - 1.5).toString() + "vh";
             photoDiv.insertBefore(markerDiv, dropdownDiv); // insertBefore() so marker is not last child which is removed
+        }
+
+        function wrongMessage(targetName) {
+            const wrongMessageDiv = document.getElementById("wrongMessageDiv");
+            const wrongMessage = document.createElement("div");
+            wrongMessage.textContent = targetName + " is not there!";
+            wrongMessageDiv.appendChild(wrongMessage);
+            // after 5 seconds, remove the message
+            setTimeout(() => {
+                wrongMessage.remove();
+            }, 5000);
         }
 
         async function main() {
