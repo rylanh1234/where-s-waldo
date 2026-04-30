@@ -70,8 +70,8 @@
                 else {
                     targetDiv.addEventListener("click", () => {
                     const isHit = targetHit([xcoord, ycoord], [coordinate.xpos, coordinate.ypos]);
+                    addMarker(photoDiv, dropdownDiv, isHit, [xcoord, ycoord]);
                     if (isHit) {
-                        addMarker(photoDiv, dropdownDiv, [xcoord, ycoord]);
                         coordinate.found = true;
                     }
                     else {
@@ -110,14 +110,32 @@
             }
         }
 
-        function addMarker(photoDiv, dropdownDiv, userCoordinates) {
+        function addMarker(photoDiv, dropdownDiv, isHit, userCoordinates) {
             const markerDiv = document.createElement("div");
-            markerDiv.style.width = "2vw";
-            markerDiv.style.height = "3vh";
-            // hollow red circle marker
-            markerDiv.style.border = "4px solid red";
-            markerDiv.style.borderRadius = "50%";
-            markerDiv.style.background = "transparent";
+            if (isHit) {
+                // hollow red circle marker for hits
+                markerDiv.style.width = "2vw";
+                markerDiv.style.height = "3vh";
+                markerDiv.style.border = "4px solid red";
+                markerDiv.style.borderRadius = "50%";
+                markerDiv.style.background = "transparent";
+            }
+            else {
+                // red X that fades away for misses
+                markerDiv.style.fontSize = "2em";
+                markerDiv.style.fontWeight = "bold";
+                markerDiv.style.color = "red"; 
+                markerDiv.textContent = "✕";
+                markerDiv.style.opacity = "1";
+                markerDiv.style.transition = "opacity 1s ease";
+                // fade after 5s with 1s duration and then remove once in case of other transitions
+                setTimeout(() => {
+                    markerDiv.style.opacity = "0";
+                    markerDiv.addEventListener("transitionend", () => {
+                        markerDiv.remove();
+                    }, { once: true });
+                }, 5000);
+            }
             markerDiv.style.position = "absolute";
             markerDiv.className = "markerDiv";
             // shift marker left 1vw and up 1.5 vh
