@@ -7,6 +7,7 @@
 </head>
 <body>
     <div id="photoDiv"></div>
+    <div id="timerDiv">00:00</div>
     <div id="wrongMessageDiv"></div>
 
     <script>
@@ -155,9 +156,27 @@
             }, 5000);
         }
 
+        function loadTimer() {
+            const timerDiv = document.getElementById("timerDiv");
+            let elapsedTime = 0;
+            setInterval((time) => {
+                elapsedTime ++;
+                timerDiv.textContent = formatTime(elapsedTime);
+            }, 1000);
+        }
+
+        function formatTime(secs) {
+            // convert seconds to MM:SS format
+            const mm = Math.floor(secs / 60);
+            const ss = secs % 60;
+            // pads start with "0" unless its already 2 digits
+            return String(mm).padStart(2, "0") + ":" + String(ss).padStart(2, "0");
+        }
+
         async function main() {
             const photoId = await selectPhoto();
             await loadPhoto(photoId);
+            loadTimer();
             addClearDropdown();
         }
         
