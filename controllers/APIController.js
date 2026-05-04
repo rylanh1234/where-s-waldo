@@ -10,3 +10,13 @@ exports.photoGet = async (req, res) => {
     });
     res.json(photo);
 }
+
+exports.startTimer = (req, res) => {
+    startTime = Date.now();
+    res.json(startTime);
+}
+
+exports.timeGet = (req, res) => {
+    const elapsedTime = Math.floor((Date.now() - startTime) / 1000);    
+    res.json(elapsedTime);
+}

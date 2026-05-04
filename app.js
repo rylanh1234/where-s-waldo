@@ -15,6 +15,7 @@ const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
 module.exports = prisma;
 
+let startTime = null; // make startTime global and reset when server restarts
 app.use("/api", APIRouter);
 app.use("/", pageRouter);
 

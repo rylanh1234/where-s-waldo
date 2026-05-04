@@ -28,6 +28,8 @@
             photoDiv.addEventListener("click", (e) => {
                 clickDropdown(e, photoDiv, photo.coordinates);
             });
+
+            await fetch("/api/start", { method: "POST" });
         }
 
         async function selectPhoto() {
@@ -156,11 +158,11 @@
             }, 5000);
         }
 
-        function loadTimer() {
+        async function loadTimer() {
             const timerDiv = document.getElementById("timerDiv");
-            let elapsedTime = 0;
-            setInterval((time) => {
-                elapsedTime ++;
+            setInterval(async() => {
+                const res = await fetch("/api/time");
+                const elapsedTime = await res.json();
                 timerDiv.textContent = formatTime(elapsedTime);
             }, 1000);
         }
