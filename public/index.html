@@ -7,15 +7,18 @@
 </head>
 <body>
     <div id="photoDiv"></div>
-    <div id="timerDiv">00:00</div>
-    <div id="wrongMessageDiv"></div>
+    <div id="sidebarDiv">
+        <div id="timerDiv">00:00</div>
+        <div id="wrongMessageDiv"></div>
+    </div>
 
     <script>
         async function loadPhoto(photoId) {
             const res = await fetch(`/api/${photoId}`);
             const photo = await res.json();
 
-            document.body.style.display = "flex";
+            document.body.style.display = "grid";
+            document.body.style.gridTemplateColumns = "1fr 1fr";
             const photoDiv = document.getElementById("photoDiv");
             const photoImg = document.createElement("img");
             photoDiv.style.width = '85vw';
@@ -29,6 +32,9 @@
                 clickDropdown(e, photoDiv, photo.coordinates);
             });
 
+            const sidebarDiv = document.getElementById("sidebarDiv");
+            sidebarDiv.style.display = "flex";
+            sidebarDiv.style.flexDirection = "column";
             await fetch("/api/start", { method: "POST" });
         }
 
@@ -76,6 +82,7 @@
                     addMarker(photoDiv, dropdownDiv, isHit, [xcoord, ycoord]);
                     if (isHit) {
                         coordinate.found = true;
+                        const isFinished = targetsFound(coordinatesArray);
                     }
                     else {
                         wrongMessage(coordinate.name);
@@ -111,6 +118,15 @@
             else {
                 return false;
             }
+        }
+
+        function targetsFound(coordinatesArray) {
+            // check each coordinate until one is not found
+            // if one is not found, return false, otherwise return true
+            if (coordinatesArray.some(coordinate => !coordinate.found)) {
+                    return false;
+                }
+            return true;
         }
 
         function addMarker(photoDiv, dropdownDiv, isHit, userCoordinates) {
