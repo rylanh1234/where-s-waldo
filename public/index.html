@@ -10,6 +10,7 @@
     <div id="sidebarDiv">
         <div id="timerDiv">00:00</div>
         <div id="wrongMessageDiv"></div>
+        <div id="gameCompleteMessageDiv"></div>
     </div>
 
     <script>
@@ -29,7 +30,7 @@
             photoDiv.appendChild(photoImg);
 
             photoDiv.addEventListener("click", (e) => {
-                clickDropdown(e, photoDiv, photo.coordinates);
+                clickDropdown(e, photoDiv, photo.id, photo.coordinates);
             });
 
             const sidebarDiv = document.getElementById("sidebarDiv");
@@ -43,7 +44,7 @@
             return photoId;
         }
 
-        function clickDropdown(e, photoDiv, coordinatesArray) {
+        function clickDropdown(e, photoDiv, photoId, coordinatesArray) {
             const dropdownDiv = document.createElement("div");
             // if dropdown already exists, remove it and make new one
             if (photoDiv.querySelector("#dropdownDiv")) {
@@ -83,6 +84,9 @@
                     if (isHit) {
                         coordinate.found = true;
                         const isFinished = targetsFound(coordinatesArray);
+                        if (isFinished) {
+                            gameComplete(photoId);
+                        }
                     }
                     else {
                         wrongMessage(coordinate.name);
@@ -189,6 +193,46 @@
             const ss = secs % 60;
             // pads start with "0" unless its already 2 digits
             return String(mm).padStart(2, "0") + ":" + String(ss).padStart(2, "0");
+        }
+
+        async function gameComplete(photoId) {
+            const resTime = await fetch("/api/time");
+            const endTime = await resTime.json();
+            // await fetch("/api/complete", {
+            //     method: "POST",
+            //     headers: { "Content-Type": "application/json" },
+            //     body: JSON.stringify({endTime})
+            // });
+
+
+            const gameCompleteMessageDiv = document.getElementById("gameCompleteMessageDiv");
+            gameCompleteMessageDiv.textContent = "All targets have been found!";
+
+            // add new record if in top 10
+            // assumes db is 10 rows
+            const resRecords = await fetch(`/api/${photoId}/records`);
+            const records = await resRecords.json();
+            if (records.some(record => record.time === null)) {
+                // loadNewRecordForm(photoId);
+            }
+            else if (records.some(record => endTime < record.time)) {
+                // loadNewRecordForm(photoId);
+            }
+        }
+
+        function loadNewRecordForm(photoId, endTime) {
+            const createRecordForm = document.createElement("form");
+            createRecordForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const data = Object.fromEntries(new FormData(createRecordForm));
+                Object.assign(data, { time: endTime });
+                const res = await fetch(`/api/${photoId}/records`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                });
+                const record = await res.json();
+            })
         }
 
         async function main() {

@@ -25,7 +25,7 @@ model Record {
   photo     Photo    @relation(fields: [photoId], references: [id]) 
   photoId   Int
   holder    String
-  time      Int
+  time      Int?
 } 
 
 model Coordinate {
