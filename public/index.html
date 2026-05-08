@@ -181,9 +181,12 @@
         async function loadTimer() {
             const timerDiv = document.getElementById("timerDiv");
             setInterval(async() => {
+                const resGlobalTime = await fetch("/api/complete");
+                const globalTime = await resGlobalTime.json();
+                const endTime = globalTime.endTime;
                 const res = await fetch("/api/time");
                 const elapsedTime = await res.json();
-                timerDiv.textContent = formatTime(elapsedTime);
+                timerDiv.textContent = endTime ? formatTime(endTime) : formatTime(elapsedTime);
             }, 1000);
         }
 
@@ -198,11 +201,11 @@
         async function gameComplete(photoId) {
             const resTime = await fetch("/api/time");
             const endTime = await resTime.json();
-            // await fetch("/api/complete", {
-            //     method: "POST",
-            //     headers: { "Content-Type": "application/json" },
-            //     body: JSON.stringify({endTime})
-            // });
+            await fetch("/api/complete", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({endTime})
+            });
 
 
             const gameCompleteMessageDiv = document.getElementById("gameCompleteMessageDiv");

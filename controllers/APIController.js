@@ -1,5 +1,5 @@
 exports.photoGet = async (req, res) => {
-    const prisma = require("../app");
+    const { prisma } = require("../app");
     const { photoId } = req.params;
     const photo = await prisma.photo.findUnique({
         where: { id: Number(photoId) },
@@ -12,21 +12,30 @@ exports.photoGet = async (req, res) => {
 }
 
 exports.startTimer = (req, res) => {
-    startTime = Date.now();
-    res.json(startTime);
+    const { globalTime } = require("../app");
+    globalTime.startTime = Date.now();
+    res.json(globalTime);
 }
 
 exports.timeGet = (req, res) => {
-    const elapsedTime = Math.floor((Date.now() - startTime) / 1000);    
+    const { globalTime } = require("../app");
+    const elapsedTime = Math.floor((Date.now() - globalTime.startTime) / 1000);    
     res.json(elapsedTime);
 }
 
 exports.timeComplete = (req, res) => {
-    res.json(req.body.endTime)
+    const { globalTime } = require("../app");
+    globalTime.endTime = req.body.endTime;
+    res.json(globalTime);
+}
+
+exports.endTimeGet = (req, res) => {
+    const { globalTime } = require("../app");
+    res.json(globalTime);
 }
 
 exports.recordsGet = async (req, res) => {
-    const prisma = require("../app");
+    const { prisma } = require("../app");
     const { photoId } = req.params;
     const records = await prisma.record.findMany({
         where: { photoId: Number(photoId) },

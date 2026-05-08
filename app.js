@@ -13,9 +13,11 @@ app.use(express.static(path.join(__dirname, "../public")));
 const connectionString = `${process.env.DATABASE_URL}`;
 const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
-module.exports = prisma;
 
-let startTime = null; // make startTime global and reset when server restarts
+// make globalTime and reset it when server restarts
+const globalTime = { startTime: null, endTime: null};
+module.exports = { prisma, globalTime };
+
 app.use("/api", APIRouter);
 app.use("/", pageRouter);
 
