@@ -9,6 +9,7 @@
     <div id="photoDiv"></div>
     <div id="sidebarDiv">
         <div id="timerDiv">00:00</div>
+        <div id="recordsDiv"></div>
         <div id="wrongMessageDiv"></div>
         <div id="gameCompleteMessageDiv"></div>
     </div>
@@ -36,6 +37,9 @@
             const sidebarDiv = document.getElementById("sidebarDiv");
             sidebarDiv.style.display = "flex";
             sidebarDiv.style.flexDirection = "column";
+
+            loadRecords(photoId);
+
             await fetch("/api/start", { method: "POST" });
         }
 
@@ -196,6 +200,24 @@
             const ss = secs % 60;
             // pads start with "0" unless its already 2 digits
             return String(mm).padStart(2, "0") + ":" + String(ss).padStart(2, "0");
+        }
+
+        async function loadRecords(photoId) {
+            const res = await fetch(`/api/${photoId}/records`);
+            const records = await res.json();
+            const recordsDiv = document.getElementById("recordsDiv");
+            records.map((record) => {
+                const recordGroup = document.createElement("div");
+                const recordHolder = document.createElement("div");
+                const recordTime = document.createElement("div");
+                recordHolder.textContent = record.holder ? record.holder : "- -";
+                recordTime.textContent = record.time ? record.time : "- -";
+                recordGroup.appendChild(recordHolder);
+                recordGroup.appendChild(recordTime);
+                recordGroup.style.display = "grid";
+                recordGroup.style.gridTemplateColumns = "1fr 1fr";
+                recordsDiv.appendChild(recordGroup);
+            })
         }
 
         async function gameComplete(photoId) {
