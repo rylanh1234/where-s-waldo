@@ -46,3 +46,20 @@ exports.recordsGet = async (req, res) => {
     })
     res.json(records);
 }
+
+exports.createRecord = async (req, res) => {
+    const { prisma } = require("../app");
+    const { photoId } = req.params;
+    const record = await prisma.photo.update({
+        where: { id: Number(photoId) },
+        data: {
+            records: {
+                create: [{
+                    holder: req.body.holderName ? req.body.holderName : "Anonymous",
+                    time: req.body.time
+                }]
+            }
+        }
+    })
+    res.json(record);
+}

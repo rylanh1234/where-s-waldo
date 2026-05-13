@@ -216,15 +216,38 @@
             const resRecords = await fetch(`/api/${photoId}/records`);
             const records = await resRecords.json();
             if (records.some(record => record.time === null)) {
-                // loadNewRecordForm(photoId);
+                loadNewRecordForm(photoId, endTime);
             }
             else if (records.some(record => endTime < record.time)) {
-                // loadNewRecordForm(photoId);
+                loadNewRecordForm(photoId, endTime);
             }
         }
 
         function loadNewRecordForm(photoId, endTime) {
             const createRecordForm = document.createElement("form");
+            const sidebarDiv = document.getElementById("sidebarDiv");
+
+            const newRecordHeader = document.createElement("h3");
+            newRecordHeader.textContent = "New Record!";
+
+            const nameLabel = document.createElement("label");
+            nameLabel.htmlFor = "holderName";
+            nameLabel.textContent = "Enter you name: ";
+
+            const nameInput = document.createElement("input");
+            nameInput.id = "holderName";
+            nameInput.name = "holderName";
+            nameInput.type = "text";
+
+            const submitBtn = document.createElement("button");
+            submitBtn.type = "submit";
+            submitBtn.textContent = "Add Record";
+
+            createRecordForm.appendChild(newRecordHeader);
+            createRecordForm.appendChild(nameLabel);
+            createRecordForm.appendChild(nameInput);
+            createRecordForm.appendChild(submitBtn);
+            sidebarDiv.appendChild(createRecordForm);
             createRecordForm.addEventListener("submit", async (e) => {
                 e.preventDefault();
                 const data = Object.fromEntries(new FormData(createRecordForm));
@@ -235,6 +258,7 @@
                     body: JSON.stringify(data)
                 });
                 const record = await res.json();
+                createRecordForm.remove();
             })
         }
 
