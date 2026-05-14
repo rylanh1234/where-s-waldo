@@ -234,7 +234,7 @@
             gameCompleteMessageDiv.textContent = "All targets have been found!";
 
             // add new record if in top 10
-            // assumes db is 10 rows
+            // assumes db gets 10 rows
             const resRecords = await fetch(`/api/${photoId}/records`);
             const records = await resRecords.json();
             if (records.some(record => record.time === null)) {
@@ -281,6 +281,12 @@
                 });
                 const record = await res.json();
                 createRecordForm.remove();
+                // reload records
+                const recordsDiv = document.getElementById("recordsDiv");
+                while (recordsDiv.firstChild) {
+                    recordsDiv.removeChild(recordsDiv.firstChild);
+                }
+                loadRecords(photoId);
             })
         }
 

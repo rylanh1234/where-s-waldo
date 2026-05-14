@@ -42,7 +42,8 @@ exports.recordsGet = async (req, res) => {
         orderBy: { time: {
             sort: "asc",
             nulls: "last"
-        } }
+        } },
+        take: 10
     })
     res.json(records);
 }
